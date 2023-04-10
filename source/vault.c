@@ -60,7 +60,7 @@ uint8_t vault_insert(Vault *vault, const char *key, const char *value)
     if (vault->entry_amount == vault->capacity)
     {
         vault->capacity += VAULT_INITIAL_CAPACITY;
-        vault->entries = (VaultEntry **) realloc(vault->entries, vault->capacity);
+        vault->entries = (VaultEntry **) realloc(vault->entries, sizeof(VaultEntry *) * vault->capacity);
     }
 
     VaultEntry *entry = (VaultEntry *) malloc(sizeof(VaultEntry));
