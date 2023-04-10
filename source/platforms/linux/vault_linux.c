@@ -20,7 +20,7 @@ char *vault_get_default_file_path(const char *vault_name)
 
     uint16_t path_length = snprintf(NULL, 0, path_format, home_directory, vault_name, vault_name);
 
-    char *path = malloc(path_length);
+    char *path = (char *) malloc(path_length + 1);
 
     sprintf(path, path_format, home_directory, vault_name, vault_name);
 
@@ -29,7 +29,7 @@ char *vault_get_default_file_path(const char *vault_name)
 
 void vault_create_required_directories(const char *path)
 {
-    char *dir_path = malloc(strlen(path) + 1);
+    char *dir_path = (char *) malloc(strlen(path) + 1);
     char *next_sep = strchr(path, '/');
 
     while (next_sep != NULL)

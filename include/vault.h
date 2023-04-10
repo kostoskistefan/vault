@@ -1,6 +1,11 @@
 #ifndef VAULT_H
 #define VAULT_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <stdint.h>
 
 typedef struct Vault Vault;
@@ -8,17 +13,20 @@ typedef struct Vault Vault;
 extern Vault *vault_create(const char *vault_name);
 extern void vault_destroy(Vault *vault);
 
-extern void vault_store_entry(Vault *vault, const char *name, const char *value);
-extern char *vault_find_entry(Vault *vault, const char *name);
+extern uint8_t vault_insert(Vault *vault, const char *key, const char *value);
+extern char   *vault_find(Vault *vault, const char *key, char *default_value);
+extern uint8_t vault_update(Vault *vault, const char *key, const char *value);
 
-extern uint8_t vault_save_to_file(Vault *vault);
-extern uint8_t vault_read_from_file(Vault *vault);
+extern uint8_t vault_save(Vault *vault);
+extern uint8_t vault_load(Vault *vault);
 
-extern void vault_create_required_directories(const char *path);
+extern void vault_dump(Vault *vault);
+
 extern char *vault_get_default_file_path(const char *vault_name);
+extern void vault_create_required_directories(const char *path);
 
-#ifdef DEBUG
-extern void vault_dump_to_stdout(Vault *vault);
+#ifdef __cplusplus
+}
 #endif
 
 #endif // VAULT_H
