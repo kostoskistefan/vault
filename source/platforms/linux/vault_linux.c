@@ -9,14 +9,14 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-char *vault_get_default_file_path(const char *vault_name)
+char *vault_get_path_from_vault_name(const char *vault_name)
 {
     char *home_directory = getenv("HOME");
 
     if (!home_directory)
         home_directory = getpwuid(getuid())->pw_dir;
 
-    const char *path_format = "%s/.config/%s/%s.vlt";
+    const char *path_format = "%s/.config/%s/%s.vault";
 
     uint16_t path_length = snprintf(NULL, 0, path_format, home_directory, vault_name, vault_name);
 
@@ -42,6 +42,11 @@ void vault_create_required_directories(const char *path)
     }
 
     free(dir_path);
+}
+
+uint8_t vault_file_exists(Vault *vault)
+{
+    return (access(vault_get_file_path(vault), F_OK) == 0);
 }
 
 #endif

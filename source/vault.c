@@ -27,7 +27,7 @@ Vault *vault_create(const char *vault_name)
     vault->capacity = VAULT_INITIAL_CAPACITY;
     vault->entry_amount = 0;
     vault->entries = (VaultEntry **) malloc(sizeof(VaultEntry *) * VAULT_INITIAL_CAPACITY);
-    vault->file_path = vault_get_default_file_path(vault_name);
+    vault->file_path = vault_get_path_from_vault_name(vault_name);
 
     return vault;
 }
@@ -44,6 +44,11 @@ void vault_destroy(Vault *vault)
     free(vault->entries);
     free(vault->file_path);
     free(vault);
+}
+
+char *vault_get_file_path(Vault *vault)
+{
+    return vault->file_path;
 }
 
 uint8_t vault_insert(Vault *vault, const char *key, const char *value)
