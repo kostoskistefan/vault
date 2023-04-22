@@ -78,7 +78,16 @@ uint8_t vault_insert(Vault *vault, const char *key, const char *value)
     return 1;
 }
 
-char *vault_find(Vault *vault, const char *key, char *default_value)
+char *vault_find(Vault *vault, const char *key)
+{
+    for (uint16_t i = 0; i < vault->entry_amount; ++i)
+        if (strcmp(vault->entries[i]->key, key) == 0)
+            return vault->entries[i]->value;
+
+    return NULL;
+}
+
+char *vault_find_or_default(Vault *vault, const char *key, char *default_value)
 {
     for (uint16_t i = 0; i < vault->entry_amount; ++i)
         if (strcmp(vault->entries[i]->key, key) == 0)
