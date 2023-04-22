@@ -130,7 +130,7 @@ uint8_t vault_save(Vault *vault)
     }
 
     for (uint16_t i = 0; i < vault->entry_amount; ++i)
-        fprintf(file, "%s = %s\n", vault->entries[i]->key, vault->entries[i]->value);
+        fprintf(file, "%s=%s\n", vault->entries[i]->key, vault->entries[i]->value);
 
     fclose(file);
 
@@ -151,8 +151,8 @@ uint8_t vault_load(Vault *vault)
 
     while (fgets(line, sizeof(line), file))
     {
-        char *key = strtok(line, " =\r\n");
-        char *value = strtok(NULL, " =\r\n");
+        char *key = strtok(line, "=\r\n");
+        char *value = strtok(NULL, "=\r\n");
 
         vault_insert(vault, key, value);
     }
@@ -165,5 +165,5 @@ uint8_t vault_load(Vault *vault)
 void vault_dump(Vault *vault)
 {
     for (uint16_t i = 0; i < vault->entry_amount; ++i)
-        printf("%s = %s\n", vault->entries[i]->key, vault->entries[i]->value);
+        printf("%s=%s\n", vault->entries[i]->key, vault->entries[i]->value);
 }
