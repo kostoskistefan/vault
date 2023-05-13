@@ -105,7 +105,7 @@ uint8_t vault_update(Vault *vault, const char *key, const char *value)
             uint16_t new_value_length = strlen(value);
 
             if (new_value_length > strlen(vault->entries[i]->value))
-                vault->entries[i]->value = realloc(vault->entries[i]->value, new_value_length);
+                vault->entries[i]->value = (char *) realloc(vault->entries[i]->value, new_value_length);
 
             strcpy(vault->entries[i]->value, value);
 
@@ -152,9 +152,17 @@ uint8_t vault_load(Vault *vault)
     while (fgets(line, sizeof(line), file))
     {
         char *key = strtok(line, "=\r\n");
+
+        if (!key)
+            continue;
+
         char *value = strtok(NULL, "=\r\n");
 
-        vault_insert(vault, key, value);
+        if (!value)
+            vault_insert(vault, key, " ");
+
+        else
+            vault_insert(vault, key, value);
     }
 
     fclose(file);
