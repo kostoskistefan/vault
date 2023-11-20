@@ -8,25 +8,26 @@ extern "C"
 
 #include <stdint.h>
 
-typedef struct Vault Vault;
+typedef struct vault_s vault_s;
 
-extern Vault *vault_create(const char *vault_name);
-extern void vault_destroy(Vault *vault);
+vault_s *vault_create(const char *vault_name);
+void vault_destroy(vault_s *const vault);
 
-extern char   *vault_get_file_path(Vault *vault);
-extern uint8_t vault_insert(Vault *vault, const char *key, const char *value);
-extern char   *vault_find(Vault *vault, const char *key);
-extern char   *vault_find_or_default(Vault *vault, const char *key, char *default_value);
-extern uint8_t vault_update(Vault *vault, const char *key, const char *value);
+char *vault_get_file_path(vault_s *vault);
+uint8_t vault_insert(vault_s *const vault, const char *key, const char *value);
+char *vault_find(vault_s *const vault, const char *key);
+char *vault_find_or_default(vault_s *const vault, const char *key, char *default_value);
+uint8_t vault_update(vault_s *const vault, const char *key, const char *value);
 
-extern uint8_t vault_save(Vault *vault);
-extern uint8_t vault_load(Vault *vault);
+uint8_t vault_save(vault_s *const vault);
+uint8_t vault_load(vault_s *const vault);
 
-extern void vault_dump(Vault *vault);
+void vault_dump(vault_s *const vault);
 
-extern uint8_t vault_file_exists(Vault *vault);
-extern char *vault_get_path_from_vault_name(const char *vault_name);
-extern void vault_create_required_directories(const char *path);
+// Platform specific functions
+uint8_t vault_file_exists(vault_s *const vault);
+char *vault_get_path_from_vault_name(const char *vault_name);
+void vault_create_required_directories(const char *path);
 
 #ifdef __cplusplus
 }

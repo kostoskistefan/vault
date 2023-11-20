@@ -9,6 +9,11 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+uint8_t vault_file_exists(vault_s *const vault)
+{
+    return (access(vault_get_file_path(vault), F_OK) == 0);
+}
+
 char *vault_get_path_from_vault_name(const char *vault_name)
 {
     char *home_directory = getenv("HOME");
@@ -42,11 +47,6 @@ void vault_create_required_directories(const char *path)
     }
 
     free(dir_path);
-}
-
-uint8_t vault_file_exists(Vault *vault)
-{
-    return (access(vault_get_file_path(vault), F_OK) == 0);
 }
 
 #endif
