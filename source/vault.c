@@ -3,24 +3,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #define VAULT_INITIAL_CAPACITY 16
 
-typedef struct vault_entry_s
+struct vault_entry_s
 {
     char *key;
     char *value;
-} vault_entry_s;
+};
 
-typedef struct vault_s
+struct vault_s
 {
     uint16_t capacity;
     uint16_t entry_amount;
     char *file_path;
     struct vault_entry_s **entries;
-} vault_s;
+};
 
-vault_s *vault_create(const char *vault_name)
+typedef struct vault_entry_s vault_entry_s;
+
+vault_s *vault_create(const char *const vault_name)
 {
     vault_s *vault = (vault_s *) malloc(sizeof(vault_s));
 
@@ -46,12 +49,18 @@ void vault_destroy(vault_s *const vault)
     free(vault);
 }
 
-char *vault_get_file_path(vault_s *const vault)
+const char *vault_get_file_path(const vault_s *const vault)
 {
     return vault->file_path;
 }
 
-uint8_t vault_insert(vault_s *const vault, const char *key, const char *value)
+uint8_t vault_file_exists(const vault_s *const vault)
+{
+    struct stat buffer;
+    return (stat(vault_get_file_path(vault), &buffer) == 0);
+}
+
+uint8_t vault_insert(vault_s *const vault, const char *const key, const char *const value)
 {
     for (uint16_t i = 0; i < vault->entry_amount; ++i)
     {
@@ -72,28 +81,31 @@ uint8_t vault_insert(vault_s *const vault, const char *key, const char *value)
     entry->key = strdup(key);
     entry->value = strdup(value);
 
-    vault->entries[vault->entry_amount] = entry;
-    ++vault->entry_amount;
+    vault->entries[vault->entry_amount++] = entry;
 
     return 1;
 }
 
-char *vault_find(vault_s *const vault, const char *key)
+const char *vault_find(const vault_s *const vault, const char *const key)
 {
     for (uint16_t i = 0; i < vault->entry_amount; ++i)
+    {
         if (strcmp(vault->entries[i]->key, key) == 0)
+        {
             return vault->entries[i]->value;
+        }
+    }
 
     return NULL;
 }
 
-char *vault_find_or_default(vault_s *const vault, const char *key, char *default_value)
+const char *vault_find_or_default(const vault_s *const vault, const char *const key, const char *const default_value)
 {
-    char *value = vault_find(vault, key);
+    const char *value = vault_find(vault, key);
     return value != NULL ? value : default_value;
 }
 
-uint8_t vault_update(vault_s *const vault, const char *key, const char *value)
+uint8_t vault_update(vault_s *const vault, const char *const key, const char *const value)
 {
     for (uint16_t i = 0; i < vault->entry_amount; ++i)
     {
@@ -102,7 +114,9 @@ uint8_t vault_update(vault_s *const vault, const char *key, const char *value)
             uint16_t new_value_length = strlen(value);
 
             if (new_value_length > strlen(vault->entries[i]->value))
+            {
                 vault->entries[i]->value = (char *) realloc(vault->entries[i]->value, new_value_length);
+            }
 
             strcpy(vault->entries[i]->value, value);
 
@@ -114,7 +128,7 @@ uint8_t vault_update(vault_s *const vault, const char *key, const char *value)
     return 0;
 }
 
-uint8_t vault_save(vault_s *const vault)
+uint8_t vault_save(const vault_s *const vault)
 {
     vault_create_required_directories(vault->file_path);
 
@@ -127,7 +141,9 @@ uint8_t vault_save(vault_s *const vault)
     }
 
     for (uint16_t i = 0; i < vault->entry_amount; ++i)
+    {
         fprintf(file, "%s=%s\n", vault->entries[i]->key, vault->entries[i]->value);
+    }
 
     fclose(file);
 
@@ -150,16 +166,22 @@ uint8_t vault_load(vault_s *const vault)
     {
         char *key = strtok(line, "=\r\n");
 
-        if (!key)
+        if (key == NULL)
+        {
             continue;
+        }
 
         char *value = strtok(NULL, "=\r\n");
 
-        if (!value)
+        if (value == NULL)
+        {
             vault_insert(vault, key, " ");
+        }
 
         else
+        {
             vault_insert(vault, key, value);
+        }
     }
 
     fclose(file);
@@ -167,8 +189,12 @@ uint8_t vault_load(vault_s *const vault)
     return 1;
 }
 
-void vault_dump(vault_s *const vault)
+#ifdef DEBUG
+void vault_dump(const vault_s *const vault)
 {
     for (uint16_t i = 0; i < vault->entry_amount; ++i)
+    {
         printf("%s=%s\n", vault->entries[i]->key, vault->entries[i]->value);
+    }
 }
+#endif

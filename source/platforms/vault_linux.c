@@ -1,25 +1,22 @@
+extern int _make_iso_compilers_happy;
+
 #ifdef __linux__
 
-#include "../../../include/vault.h"
+#include "../../include/vault.h"
 #include <pwd.h>
 #include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/stat.h>
 
-uint8_t vault_file_exists(vault_s *const vault)
-{
-    return (access(vault_get_file_path(vault), F_OK) == 0);
-}
-
-char *vault_get_path_from_vault_name(const char *vault_name)
+char *vault_get_path_from_vault_name(const char *const vault_name)
 {
     char *home_directory = getenv("HOME");
 
-    if (!home_directory)
+    if (home_directory == NULL)
+    {
         home_directory = getpwuid(getuid())->pw_dir;
+    }
 
     const char *path_format = "%s/.config/%s/%s.vault";
 
@@ -32,7 +29,7 @@ char *vault_get_path_from_vault_name(const char *vault_name)
     return path;
 }
 
-void vault_create_required_directories(const char *path)
+void vault_create_required_directories(const char *const path)
 {
     char *dir_path = (char *) malloc(strlen(path) + 1);
     char *next_sep = strchr(path, '/');
